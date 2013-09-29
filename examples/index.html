@@ -2,7 +2,7 @@
   <head>
     <script src="../vendor/js/jquery.min.js"></script>
     <script src="../vendor/js/sigma.min.js"></script>
-    <script src="./graph_builder.js"></script>
+    <script src="./digital_life_graph_builder.js"></script>
 
     <style type="text/css">
       #sigma {
@@ -117,7 +117,7 @@
       ]
 
       $(function() {
-        graph = new GraphBuilder( 
+        graph = new DigitalLifeGraphBuilder( 
           'sigma', {
             service_nodes: services,
             device_nodes: devices,
