@@ -66,7 +66,6 @@
             position = _this.nodePositionInALine(nodes.length, idx);
             position.y = position.y * style.distance;
         }
-        console.log('--');
         position.x = position.x + x_offset;
         return _this.sigma_instance.addNode(_this.nodeId(el[0]), {
           label: el[0],
