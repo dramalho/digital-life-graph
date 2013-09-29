@@ -40,30 +40,55 @@ class @DigitalLifeGraphBuilder
 
     result
 
-  createNodes: (nodes, frequency, x_offset, radius ) ->
+  createNodes: (nodes, frequency, x_offset, style ) ->
     frequency = frequency || {}
     x_offset = x_offset || 0
-    radius = radius || 200
+    style = style || { type: 'circular', radius: 200}
 
     nodes = nodes.filter (el) =>
       frequency[ @nodeId(el[0]) ] > 0
 
     $(nodes).each (idx, el) =>
+      switch style.type
+        when 'circular'
+          position = @nodePositionInACircle(nodes.length, idx)
+
+          position.x = position.x * style.radius
+          position.y = position.y * style.radius
+        when 'line'
+          position = @nodePositionInALine(nodes.length,idx)
+          position.y = position.y * style.distance
+
+      position.x = position.x + x_offset
+
       @sigma_instance.addNode @nodeId(el[0]), 
         {
           label: el[0],
           color: el[1],
-          x: (Math.sin( (Math.PI * 2) / nodes.length * idx) * radius) + x_offset,
-          y: Math.cos( (Math.PI * 2) / nodes.length * idx) * radius,
+          x: position.x,
+          y: position.y,
           size: 1 + (frequency[@nodeId(el[0])] || 0 )
         }
+
+  nodePositionInACircle: (element_count,element_index) ->
+    {
+      x: ( Math.sin( (Math.PI * 2) / element_count * element_index ) ) || 0,
+      y: ( Math.cos( (Math.PI * 2) / element_count * element_index ) ) || 1
+    }
+
+  nodePositionInALine: (element_count, element_index) ->
+    el_initial_position = 0 - (element_count/2)
+    {
+      x: 0,
+      y: el_initial_position + element_index
+    }
 
   draw: ->
     # Calculate the frequency of all the nodes
     @node_frequency
 
-    @createNodes(@service_nodes, @node_frequency ,    0, 150 )
-    @createNodes(@device_nodes, @node_frequency , -400,  50 )
+    @createNodes(@service_nodes, @node_frequency ,    0, {type: 'circular', radius: 150} )
+    @createNodes(@device_nodes, @node_frequency , -400,  {type: 'line', distance: 40 } )
 
     $(@service_edges.concat(@service_device_edges)).each (idx,el) =>
       @sigma_instance.addEdge( el.join('_'), el[0], el[1], {arrow: 'target'} )

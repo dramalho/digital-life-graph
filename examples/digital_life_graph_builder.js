@@ -43,30 +43,68 @@
       return result;
     };
 
-    DigitalLifeGraphBuilder.prototype.createNodes = function(nodes, frequency, x_offset, radius) {
+    DigitalLifeGraphBuilder.prototype.createNodes = function(nodes, frequency, x_offset, style) {
       var _this = this;
       frequency = frequency || {};
       x_offset = x_offset || 0;
-      radius = radius || 200;
+      style = style || {
+        type: 'circular',
+        radius: 200
+      };
       nodes = nodes.filter(function(el) {
         return frequency[_this.nodeId(el[0])] > 0;
       });
       return $(nodes).each(function(idx, el) {
+        var position;
+        switch (style.type) {
+          case 'circular':
+            position = _this.nodePositionInACircle(nodes.length, idx);
+            position.x = position.x * style.radius;
+            position.y = position.y * style.radius;
+            break;
+          case 'line':
+            position = _this.nodePositionInALine(nodes.length, idx);
+            position.y = position.y * style.distance;
+        }
+        console.log('--');
+        position.x = position.x + x_offset;
         return _this.sigma_instance.addNode(_this.nodeId(el[0]), {
           label: el[0],
           color: el[1],
-          x: (Math.sin((Math.PI * 2) / nodes.length * idx) * radius) + x_offset,
-          y: Math.cos((Math.PI * 2) / nodes.length * idx) * radius,
+          x: position.x,
+          y: position.y,
           size: 1 + (frequency[_this.nodeId(el[0])] || 0)
         });
       });
     };
 
+    DigitalLifeGraphBuilder.prototype.nodePositionInACircle = function(element_count, element_index) {
+      return {
+        x: (Math.sin((Math.PI * 2) / element_count * element_index)) || 0,
+        y: (Math.cos((Math.PI * 2) / element_count * element_index)) || 1
+      };
+    };
+
+    DigitalLifeGraphBuilder.prototype.nodePositionInALine = function(element_count, element_index) {
+      var el_initial_position;
+      el_initial_position = 0 - (element_count / 2);
+      return {
+        x: 0,
+        y: el_initial_position + element_index
+      };
+    };
+
     DigitalLifeGraphBuilder.prototype.draw = function() {
       var _this = this;
       this.node_frequency;
-      this.createNodes(this.service_nodes, this.node_frequency, 0, 150);
-      this.createNodes(this.device_nodes, this.node_frequency, -400, 50);
+      this.createNodes(this.service_nodes, this.node_frequency, 0, {
+        type: 'circular',
+        radius: 150
+      });
+      this.createNodes(this.device_nodes, this.node_frequency, -400, {
+        type: 'line',
+        distance: 40
+      });
       $(this.service_edges.concat(this.service_device_edges)).each(function(idx, el) {
         return _this.sigma_instance.addEdge(el.join('_'), el[0], el[1], {
           arrow: 'target'
