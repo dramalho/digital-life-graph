@@ -91,10 +91,10 @@ class @DigitalLifeGraphBuilder
     @createNodes(@device_nodes, @node_frequency , -400,  {type: 'line', distance: 40 } )
 
     $(@service_edges.concat(@service_device_edges)).each (idx,el) =>
-      @sigma_instance.addEdge( el.join('_'), el[0], el[1], {arrow: 'target'} )
+      @sigma_instance.addEdge( el.join('_'), @nodeId(el[0]), @nodeId(el[1]), {arrow: 'target'} )
 
     $(@device_service_edges).each (idx,el) =>
-      @sigma_instance.addEdge( el.join('_'), el[0], el[1], {arrow: 'target', type: 'line'} )
+      @sigma_instance.addEdge( el.join('_'), @nodeId(el[0]), @nodeId(el[1]), {arrow: 'target', type: 'line'} )
    
     @sigma_instance.draw()
 
