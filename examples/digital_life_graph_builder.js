@@ -105,12 +105,12 @@
         distance: 40
       });
       $(this.service_edges.concat(this.service_device_edges)).each(function(idx, el) {
-        return _this.sigma_instance.addEdge(el.join('_'), el[0], el[1], {
+        return _this.sigma_instance.addEdge(el.join('_'), _this.nodeId(el[0]), _this.nodeId(el[1]), {
           arrow: 'target'
         });
       });
       $(this.device_service_edges).each(function(idx, el) {
-        return _this.sigma_instance.addEdge(el.join('_'), el[0], el[1], {
+        return _this.sigma_instance.addEdge(el.join('_'), _this.nodeId(el[0]), _this.nodeId(el[1]), {
           arrow: 'target',
           type: 'line'
         });
